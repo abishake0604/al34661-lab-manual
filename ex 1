@@ -1,0 +1,39 @@
+def find_s(training_data):
+    """
+    training_data: list of tuples (attributes, label)
+                   label should be 'Yes' or 'No'
+    """
+
+    # Step 1: Initialize hypothesis to most specific (None)
+    hypothesis = None
+
+    # Step 2: Iterate through training examples
+    for attributes, label in training_data:
+        if label == 'Yes':
+            # Initialize hypothesis with first positive example
+            if hypothesis is None:
+                hypothesis = attributes.copy()
+            else:
+                # Generalize hypothesis where needed
+                for i in range(len(hypothesis)):
+                    if hypothesis[i] != attributes[i]:
+                        hypothesis[i] = '?'
+
+    return hypothesis
+
+
+# -----------------------------
+# Example training dataset
+# -----------------------------
+# Attributes: [Sky, AirTemp, Humidity, Wind, Water, Forecast]
+training_data = [
+    (['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same'], 'Yes'),
+    (['Sunny', 'Warm', 'High', 'Strong', 'Warm', 'Same'], 'Yes'),
+    (['Rainy', 'Cold', 'High', 'Strong', 'Warm', 'Change'], 'No'),
+    (['Sunny', 'Warm', 'High', 'Strong', 'Cool', 'Change'], 'Yes')
+]
+
+# Run FIND-S
+final_hypothesis = find_s(training_data)
+
+print("Final hypothesis:", final_hypothesis)
