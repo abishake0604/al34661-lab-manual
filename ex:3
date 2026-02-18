@@ -1,0 +1,55 @@
+import math
+import pandas as pd
+
+# ----------------------------
+# Step 1: Create Dataset
+# ----------------------------
+
+data = {
+    'Outlook': ['Sunny', 'Sunny', 'Overcast', 'Rain', 'Rain', 'Rain',
+                'Overcast', 'Sunny', 'Sunny', 'Rain', 'Sunny', 'Overcast', 'Overcast', 'Rain'],
+    'Temperature': ['Hot', 'Hot', 'Hot', 'Mild', 'Cool', 'Cool',
+                    'Mild', 'Hot', 'Cool', 'Mild', 'Mild', 'Mild', 'Hot', 'Mild'],
+    'Humidity': ['High', 'High', 'High', 'High', 'Normal', 'Normal',
+                 'Normal', 'High', 'Normal', 'Normal', 'Normal', 'High', 'Normal', 'High'],
+    'Wind': ['Weak', 'Strong', 'Weak', 'Weak', 'Weak', 'Strong',
+             'Strong', 'Weak', 'Weak', 'Weak', 'Strong', 'Strong', 'Weak', 'Strong'],
+    'PlayTennis': ['No', 'No', 'Yes', 'Yes', 'Yes', 'No',
+                   'Yes', 'No', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No']
+}
+
+df = pd.DataFrame(data)
+
+# ----------------------------
+# Step 2: Entropy Function
+# ----------------------------
+
+def entropy(target_col):
+    elements, counts = target_col.value_counts().index, target_col.value_counts().values
+    entropy_value = 0
+    for i in range(len(elements)):
+        probability = counts[i] / sum(counts)
+        entropy_value -= probability * math.log2(probability)
+    return entropy_value
+
+
+# ----------------------------
+# Step 3: Information Gain
+# ----------------------------
+
+def information_gain(data, split_attribute, target="PlayTennis"):
+    total_entropy = entropy(data[target])
+    
+    values, counts = data[split_attribute].value_counts().index, data[split_attribute].value_counts().values
+    
+    weighted_entropy = 0
+    for i in range(len(values)):
+        subset = data[data[split_attribute] == values[i]]
+        weighted_entropy += (counts[i] / sum(counts)) * entropy(subset[target])
+    
+    return total_entropy - weighted_entropy
+
+
+# ----------------------------
+# Step 4: ID3 Algorithm
+# ------------------
