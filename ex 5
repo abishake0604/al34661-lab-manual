@@ -1,0 +1,49 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_boston
+from sklearn.preprocessing import StandardScaler
+
+# Load dataset
+data = load_boston()
+X = data.data[:, 5]  # RM feature
+y = data.target
+
+# Reshape and scale
+X = X.reshape(-1, 1)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Add intercept term
+X_design = np.hstack([np.ones_like(X_scaled), X_scaled])
+
+def locally_weighted_regression(X, y, tau):
+    m = X.shape[0]
+    y_pred = np.zeros(m)
+    
+    for i in range(m):
+        weights = np.exp(-(X[:,1] - X[i,1])**2 / (2 * tau**2))
+        W = np.diag(weights)
+        theta = np.linalg.pinv(X.T @ W @ X) @ X.T @ W @ y
+        y_pred[i] = X[i] @ theta
+    
+    return y_pred
+
+# Fit model
+tau = 0.5
+y_pred = locally_weighted_regression(X_design, y, tau)
+
+# Sort for plotting
+sorted_idx = np.argsort(X_scaled[:,0])
+X_sorted = X_scaled[sorted_idx]
+y_sorted = y[sorted_idx]
+y_pred_sorted = y_pred[sorted_idx]
+
+# Plot
+plt.figure(figsize=(8,6))
+plt.scatter(X_scaled, y, color='blue', alpha=0.5, label='Data Points')
+plt.plot(X_sorted, y_pred_sorted, color='red', linewidth=2, label='LWR Fit')
+plt.xlabel('Standardized Average Rooms (RM)')
+plt.ylabel('Median House Price')
+plt.title('Locally Weighted Regression (LWR)')
+plt.legend()
+plt.show()
